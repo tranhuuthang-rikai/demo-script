@@ -33,12 +33,21 @@ function getNewUrlReplace(originalUrl) {
 async function getNewUrlReplaceVideo(originalUrl) {
   const currentDomain = removeProtocol(window.location.origin);
   const fullUrl = new URL(originalUrl, window.location.href).href;
+  console.log("fullurl", fullUrl)
+
   const domainVideoUrl = window.btoa(fullUrl);
+  console.log("domainVideoUrl", domainVideoUrl)
 
   try {
     const url = `${URL_CFRONT_VIDEO}/${currentDomain}/${domainVideoUrl}?token=${token}`;
+    console.log("url_upload", url)
+
     const response = await fetch(url);
+    console.log("response", response)
+
     const data = await response.json();
+    console.log(data)
+
     const urlValue = Object.values(data.data)[0] || null;
     return urlValue ? urlValue + `?token=${token}` : null;
   } catch (error) {
@@ -221,9 +230,12 @@ function processAllVideos() {
       if (sources) {
         sources.forEach(async (source) => {
           const urlSource = source.getAttribute("src");
-
           if (urlSource && urlSource.endsWith(".mp4")) {
+
+            console.log("____test____")
             const urlReplace = await getNewUrlReplaceVideo(urlSource);
+            console.log("urlReplace", urlReplace)
+
             urlReplace
               ? replaceVideoSrcSource(source, urlReplace)
               : replaceVideoSrcSource(

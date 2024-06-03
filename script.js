@@ -33,20 +33,12 @@ function getNewUrlReplace(originalUrl) {
 async function getNewUrlReplaceVideo(originalUrl) {
   const currentDomain = removeProtocol(window.location.origin);
   const fullUrl = new URL(originalUrl, window.location.href).href;
-  console.log("fullurl", fullUrl)
-
   const domainVideoUrl = window.btoa(fullUrl);
-  console.log("domainVideoUrl", domainVideoUrl)
 
   try {
     const url = `${URL_CFRONT_VIDEO}/${currentDomain}/${domainVideoUrl}?token=${token}`;
-    console.log("url_upload", url)
-
     const response = await fetch(url);
-    console.log("response", response)
-
     const data = await response.json();
-    console.log(data)
 
     const urlValue = Object.values(data.data)[0] || null;
     return urlValue ? urlValue + `?token=${token}` : null;
@@ -116,7 +108,11 @@ function processCssRule(rule, baseSheetUrl) {
       if (urlValue && urlValue.includes("url(")) {
         const urlRegex = /url\(["']?(.*?)["']?\)/g;
         const updatedCssString = urlValue.replace(urlRegex, (match, url) => {
-          if (shouldSkipUrl(url) || isDataBase64(url) || url.includes(URL_CFRONT)) {
+          if (
+            shouldSkipUrl(url) ||
+            isDataBase64(url) ||
+            url.includes(URL_CFRONT)
+          ) {
             return match;
           }
           const urlOrigin = getOrigin(url, baseSheetUrl);
@@ -219,7 +215,7 @@ function processAllVideos() {
     videoElements.forEach(async (video) => {
       const urlVideo = video.getAttribute("src");
 
-      if (urlVideo && urlVideo.endsWith(".mp4")) {
+      if (urlVideo) {
         const urlReplace = await getNewUrlReplaceVideo(urlVideo);
         urlReplace
           ? replaceVideoSrcSource(video, urlReplace)
@@ -230,11 +226,9 @@ function processAllVideos() {
       if (sources) {
         sources.forEach(async (source) => {
           const urlSource = source.getAttribute("src");
-          if (urlSource && urlSource.endsWith(".mp4")) {
-
-            console.log("____test____")
+          if (urlSource) {
             const urlReplace = await getNewUrlReplaceVideo(urlSource);
-            console.log("urlReplace", urlReplace)
+            console.log("urlReplace", urlReplace);
 
             urlReplace
               ? replaceVideoSrcSource(source, urlReplace)
@@ -296,4 +290,3 @@ fetchToken()
   .catch((error) => {
     console.error("An error occurred:", error);
   });
-

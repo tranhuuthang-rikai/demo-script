@@ -1,12 +1,13 @@
 const URL_CFRONT = "https://d2jtrui7bbhww8.cloudfront.net";
 const URL_CFRONT_VIDEO = "https://d2jtrui7bbhww8.cloudfront.net/upload-video";
 const URL_GENERATOR_TOKEN =
-  "https://d2jtrui7bbhww8.cloudfront.net/generate-token/test";
+  "https://d2jtrui7bbhww8.cloudfront.net/generate-token";
 var token = "";
+const currentDomain = removeProtocol(window.location.origin);
 
 function fetchToken() {
   return new Promise((resolve, reject) => {
-    fetch(URL_GENERATOR_TOKEN)
+    fetch(`${URL_GENERATOR_TOKEN}/${currentDomain}`)
       .then((response) => response.json())
       .then((data) => {
         token = data.data;
@@ -24,7 +25,6 @@ function removeProtocol(url) {
 }
 
 function getNewUrlReplace(originalUrl) {
-  const currentDomain = removeProtocol(window.location.origin);
   const fullUrl = new URL(originalUrl, window.location.href).href;
   let domainImgUrlEncode = window.btoa(fullUrl);
   return `${URL_CFRONT}/${currentDomain}/${domainImgUrlEncode}?token=${token}`;
@@ -79,6 +79,9 @@ function replaceImageSrcset(element) {
           return `${newUrl} ${descriptor}`;
         })
         .join(", ");
+        
+      element.setAttribute("loading", "lazy");
+      element.setAttribute("decoding", "async");
       element.srcset = newSrcset;
     }
     resolve(`Processed image srcset for: ${element.srcset || "No srcset"}`);

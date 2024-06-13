@@ -1,7 +1,6 @@
-const URL_CFRONT = "https://d2jtrui7bbhww8.cloudfront.net";
-const URL_CFRONT_VIDEO = "https://d2jtrui7bbhww8.cloudfront.net/upload-video";
-const URL_GENERATOR_TOKEN =
-  "https://d2jtrui7bbhww8.cloudfront.net/generate-token";
+const URL_CF = "https://d2jtrui7bbhww8.cloudfront.net";
+const URL_CF_VIDEO = `${URL_CF}/upload-video`;
+const URL_GENERATOR_TOKEN = `${URL_CF}/generate-token`;
 var token = "";
 const currentDomain = removeProtocol(window.location.origin);
 
@@ -27,7 +26,7 @@ function removeProtocol(url) {
 function getNewUrlReplace(originalUrl) {
   const fullUrl = new URL(originalUrl, window.location.href).href;
   let domainImgUrlEncode = window.btoa(fullUrl);
-  return `${URL_CFRONT}/${currentDomain}/${domainImgUrlEncode}?token=${token}`;
+  return `${URL_CF}/${currentDomain}/${domainImgUrlEncode}?token=${token}`;
 }
 
 async function getNewUrlReplaceVideo(originalUrl) {
@@ -36,7 +35,7 @@ async function getNewUrlReplaceVideo(originalUrl) {
   const domainVideoUrl = window.btoa(fullUrl);
 
   try {
-    const url = `${URL_CFRONT_VIDEO}/${currentDomain}/${domainVideoUrl}?token=${token}`;
+    const url = `${URL_CF_VIDEO}/${currentDomain}/${domainVideoUrl}?token=${token}`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -79,7 +78,7 @@ function replaceImageSrcset(element) {
           return `${newUrl} ${descriptor}`;
         })
         .join(", ");
-        
+
       element.setAttribute("loading", "lazy");
       element.setAttribute("decoding", "async");
       element.srcset = newSrcset;
@@ -114,7 +113,7 @@ function processCssRule(rule, baseSheetUrl) {
           if (
             shouldSkipUrl(url) ||
             isDataBase64(url) ||
-            url.includes(URL_CFRONT)
+            url.includes(URL_CF)
           ) {
             return match;
           }
@@ -276,10 +275,10 @@ const replaceVideoSrcSource = (source, videoReplace, attr = "") => {
 };
 fetchToken()
   .then((fetchedToken) => {
-    if (!fetchedToken) {
-      console.log("Token is not available, processing will not run.");
-      return;
-    }
+    // if (!fetchedToken) {
+    //   console.log("Token is not available, processing will not run.");
+    //   return;
+    // }
     return Promise.all([processAllImages(), processAllVideos()]);
   })
   .then(([imageResults, videoPaths]) => {
